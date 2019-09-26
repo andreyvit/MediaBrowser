@@ -139,7 +139,7 @@ func floorcgf(x: CGFloat) -> CGFloat {
     public var currentGridContentOffset = CGPoint(x: 0, y: CGFloat.greatestFiniteMagnitude)
     
     /// Set MediaBrowserDelegate for MediaBrowser
-    public weak var delegate: MediaBrowserDelegate?
+    public var delegate: MediaBrowserDelegate?
     
     /// Available zoom photos to fill
     public var zoomPhotosToFill = true
@@ -921,6 +921,36 @@ func floorcgf(x: CGFloat) -> CGFloat {
         }
     }
 
+    open func reloadGrid() {
+        gridController?.collectionView.reloadData()
+    }
+    
+    open func updateGridButtons() {
+        //print("updateSelectionButtons")
+        guard displaySelectionButtons else {
+            return
+        }
+        guard let delegate = delegate else {
+            return
+        }
+        guard let gridController = gridController else {
+            return
+        }
+        let visibleIndexPaths = gridController.collectionView!.indexPathsForVisibleItems
+        let visibleCells = gridController.collectionView!.visibleCells
+        for c in visibleCells {
+            guard let cell = c as? MediaGridCell else {
+                continue
+            }
+            guard let indexPath = gridController.collectionView!.indexPath(for: cell) else {
+                continue
+            }
+            let index = indexPath.row
+            let selected = delegate.isMediaSelected(at: index, in: self)
+            cell.isSelected = selected
+        }
+    }
+    
     var numberOfMedias: Int {
         if mediaCount == -1 {
             if let d = delegate {
@@ -1049,7 +1079,7 @@ func floorcgf(x: CGFloat) -> CGFloat {
                         if let media = mediaAtIndex(index: pageIndex - i) {
                             if nil == media.underlyingImage {
                                 media.loadUnderlyingImageAndNotify()
-                                print("Pre-loading image at index \(pageIndex - i)")
+                                //print("Pre-loading image at index \(pageIndex - i)")
                             }
                         }
                     }
@@ -1061,7 +1091,7 @@ func floorcgf(x: CGFloat) -> CGFloat {
                         if let media = mediaAtIndex(index: pageIndex + i) {
                             if nil == media.underlyingImage {
                                 media.loadUnderlyingImageAndNotify()
-                                print("Pre-loading image at index \(pageIndex + i)")
+                                //print("Pre-loading image at index \(pageIndex + i)")
                             }
                         }
                     }
