@@ -1232,42 +1232,55 @@ func floorcgf(x: CGFloat) -> CGFloat {
     
     //MARK: - Navigation
     
+    func singlePluralSelection(count: Int, single: String, plural: String) -> String {
+        return count == 1 ? single : plural
+    }
+    
+    func gridModeTitle(count: Int, selectionMode: Bool) -> String {
+        if selectionMode {
+            return delegate?.titleForGridSelectionMode(count: count) ?? NSLocalizedString("Select Photos", comment: "")
+        }
+        if let title = delegate?.titleForGridMode(count: count) {
+            return title
+        }
+        let photoText = NSLocalizedString("photo", comment: "Used in the context: '1 photo'")
+        let photosText = NSLocalizedString("photos", comment: "Used in the context: '3 photos'")
+        let text = singlePluralSelection(count: count, single: photoText, plural: photosText)
+        return "\(count) \(text)"
+    }
+
+    func viewModeTitle(index: Int, count: Int) -> String? {
+        if let title = delegate?.titleForViewMode(index: index, count: count) {
+            return title
+        }
+        if count == 0 {
+            return nil
+        }
+        if let d = delegate {
+            if let title = d.title(for: self, at: currentPageIndex) {
+                return title
+            }
+        }
+        let str = NSLocalizedString("of", comment: "Used in the context: 'Showing 1 of 3 items'")
+        return "\(index + 1) \(str) \(count)"
+    }
+
     open func updateNavigation() {
         // Title
         let medias = numberOfMedias
         if let gc = gridController {
+            title = gridModeTitle(count: medias, selectionMode: gc.selectionMode)
             if gc.selectionMode {
-                self.title = NSLocalizedString("Select Photos", comment: "")
-                if let ab = actionButton {
+                if let actionButton = actionButton {
                     // only show Action button on top right if this place is empty (no Done button there)
-                    if nil == self.navigationItem.rightBarButtonItem {
-                        self.navigationItem.rightBarButtonItem = ab
+                    if self.navigationItem.rightBarButtonItem == nil {
+                        self.navigationItem.rightBarButtonItem = actionButton
                     }
                 }
-            } else {
-                let photosText: String
-                
-                if 1 == medias {
-                    photosText = NSLocalizedString("photo", comment: "Used in the context: '1 photo'")
-                } else {
-                    photosText = NSLocalizedString("photos", comment: "Used in the context: '3 photos'")
-                }
-                
-                title = "\(medias) \(photosText)"
-            }
-        } else if medias > 1 {
-            if let d = delegate {
-                title = d.title(for: self, at: currentPageIndex)
-            }
-            
-            if nil == title {
-                let str = NSLocalizedString("of", comment: "Used in the context: 'Showing 1 of 3 items'")
-                title = "\(currentPageIndex + 1) \(str) \(numberOfMedias)"
             }
         } else {
-            title = nil
+            title = viewModeTitle(index: currentPageIndex, count: medias)
         }
-        
         // Buttons
         if let prev = previousButton {
             prev.isEnabled = (currentPageIndex > 0)
