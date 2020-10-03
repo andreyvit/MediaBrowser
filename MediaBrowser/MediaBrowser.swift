@@ -43,7 +43,11 @@ func floorcgf(x: CGFloat) -> CGFloat {
 	internal var previousButton: UIBarButtonItem?
     internal var nextButton: UIBarButtonItem?
     internal var actionButton: UIBarButtonItem?
-    internal var doneButton: UIBarButtonItem?
+    open var doneButton: UIBarButtonItem? {
+        didSet {
+            navigationItem.rightBarButtonItem = doneButton
+        }
+    }
     
     // Grid
     internal var gridController: MediaGridViewController?
@@ -284,7 +288,13 @@ func floorcgf(x: CGFloat) -> CGFloat {
         } else {
             isVCBasedStatusBarAppearance = true
         }
-        
+
+        doneButton = UIBarButtonItem(
+            title: NSLocalizedString("Done", comment: ""),
+            style: .done,
+            target: self,
+            action: #selector(doneButtonPressed)
+        )
         
         hidesBottomBarWhenPushed = true
         automaticallyAdjustsScrollViewInsets = false
@@ -480,13 +490,6 @@ func floorcgf(x: CGFloat) -> CGFloat {
         // Navigation buttons
         if let navi = navigationController {
             if navi.viewControllers.count > 0 && navi.viewControllers[0] == self {
-                // We're first on stack so show done button
-                doneButton = UIBarButtonItem(
-                    title: NSLocalizedString("Done", comment: ""),
-                    style: .done,
-                    target: self,
-                    action: #selector(doneButtonPressed))
-
                 // Set appearance
                 if let done = doneButton {
                     done.setBackgroundImage(nil, for: .normal, barMetrics: .default)
