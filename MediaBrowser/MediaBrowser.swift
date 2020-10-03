@@ -304,7 +304,7 @@ func floorcgf(x: CGFloat) -> CGFloat {
         pagingScrollView.delegate = nil
         NotificationCenter.default.removeObserver(self)
         releaseAllUnderlyingPhotos(preserveCurrent: false)
-        SDImageCache.shared().clearMemory() // clear memory
+        SDImageCache.shared.clearMemory()
     }
 
     private func releaseAllUnderlyingPhotos(preserveCurrent: Bool) {
@@ -936,7 +936,7 @@ func floorcgf(x: CGFloat) -> CGFloat {
         guard let gridController = gridController else {
             return
         }
-        let visibleIndexPaths = gridController.collectionView!.indexPathsForVisibleItems
+        //let visibleIndexPaths = gridController.collectionView!.indexPathsForVisibleItems
         let visibleCells = gridController.collectionView!.visibleCells
         for c in visibleCells {
             guard let cell = c as? MediaGridCell else {
